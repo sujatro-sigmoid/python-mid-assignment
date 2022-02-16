@@ -5,6 +5,9 @@ class InvalidTypeError(LoggerException):
     pass
 class TimestampsNotInOrderError(LoggerException):
     pass
+class InputsViolatingConstraintsError(LoggerException):
+    pass
+
 
 class Logger:
     def __init__(self):
@@ -28,7 +31,9 @@ class Logger:
         prev_timestamp = 0
         for q in queries:
             if type(q[0]) is not int or type(q[1]) is not str:
-                raise InvalidTypeError('invalid data types')
+                raise InvalidTypeError('data types are invalid')
+            elif q[0] < 0 or q[0] > 1000000000 or len(q[1]) < 1 or len(q[1]) > 30 or len(queries) > 10000:
+                raise InputsViolatingConstraintsError('inputs are not within the constraints')
             elif q[0] < prev_timestamp:
                 raise TimestampsNotInOrderError('timestamps in the stream of inputs are not in order')
             else:
@@ -37,7 +42,6 @@ class Logger:
         for q in queries:
             ans.append(self.should_print_message(q[0], q[1]))
         return ans
-
 
 # log = Logger()
 # queries = [[1, "foo"], [2, "bar"], [3, "foo"], [8, "bar"], [10, "foo"], [11, "foo"]]
